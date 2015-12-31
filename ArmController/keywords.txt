@@ -1,0 +1,30 @@
+ArmController	KEYWORD 1
+
+init	KEYWORD 2
+
+set_arm_h_pin	KEYWORD 2
+set_arm_v_pin	KEYWORD 2
+set_wrist_pin	KEYWORD 2
+set_grasp_pin	KEYWORD 2
+
+get_arm_h_pos	KEYWORD 2
+get_arm_v_pos	KEYWORD 2
+get_wrist_pos	KEYWORD 2
+get_grasp_pos	KEYWORD 2
+
+set_arm_h_pos	KEYWORD 2
+set_arm_v_pos	KEYWORD 2
+set_arm_pos	KEYWORD 2
+set_wrist_pos	KEYWORD 2
+set_grasp_pos	KEYWORD 2
+
+move_arm_up	KEYWORD 2
+move_arm_down	KEYWORD 2
+move_arm_left	KEYWORD 2
+move_arm_right	KEYWORD 2
+
+move_wrist_left	KEYWORD 2
+move_wrist_right	KEYWORD 2
+	
+open_grasp	KEYWORD 2
+close_grasp	KEYWORD 2
