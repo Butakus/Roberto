@@ -78,7 +78,7 @@ void loop(){
 	digitalWrite(13, LOW);
 
 	error = comms.read(&command, &argument);
-	if (error == NO_ERROR){
+	if (error != NO_ERROR){
 		delay(100);
 	}
 	else{
