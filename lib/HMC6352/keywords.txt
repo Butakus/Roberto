@@ -1,0 +1,10 @@
+HMC6352	KEYWORD 1
+
+
+get_heading	KEYWORD 2
+start_calibration	KEYWORD 2
+stop_calibration	KEYWORD 2
+calibrate	KEYWORD 2
+read_EEPROM	KEYWORD 2
+sleep	KEYWORD 2
+wake_up	KEYWORD 2
