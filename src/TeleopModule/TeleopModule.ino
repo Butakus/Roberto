@@ -12,6 +12,7 @@
 *  Date:	12/11/2015
 */
 
+#include <Motor.h>
 #include <RobotBase.h>
 #include <ArmController.h>
 #include <ArdPiComm.h>
@@ -54,28 +55,32 @@ Motor mA(MotorA1_PIN, MotorA2_PIN, EnableA_PIN);
 Motor mB(MotorB1_PIN, MotorB2_PIN, EnableB_PIN);
 RobotBase base(&mA, &mB);
 
-ArmController arm(ARM_H_PIN, ARM_V_PIN, WRIST_PIN, GRASP_PIN);
+//ArmController arm(ARM_H_PIN, ARM_V_PIN, WRIST_PIN, GRASP_PIN);
+ArmController arm;
 
 ArdPiComm comms;
 //struct comm_data *data;
 uint8_t command, argument, error;
 
 void setup(){
-	Serial.begin(9600);
-	comms.begin(&Serial);
-
+	Serial3.begin(9600);
+	comms.begin(&Serial3);
+  arm.init(ARM_H_PIN, ARM_V_PIN, WRIST_PIN, GRASP_PIN);
+  
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
-
-	//base.stop();
+  
+	base.stop();
+  base.set_speed(255);
 	delay(5000);
 	digitalWrite(13, LOW);
+  //Serial.println("Ready");
 }
 
 void loop(){
-	digitalWrite(13, HIGH);
-	delay(500);
-	digitalWrite(13, LOW);
+	//digitalWrite(13, HIGH);
+	//delay(500);
+	//digitalWrite(13, LOW);
 
 	error = comms.read(&command, &argument);
 	if (error != NO_ERROR){

@@ -8,17 +8,16 @@
 *  Date:	12/11/2015
 */
 
-
 // Everything implemented in the libraries. Nothing fancy to do here, just linking.
 
 // Movement commands:
 void stop(){
-	digitalWrite(13,LOW);
+	//digitalWrite(13,LOW);
 	base.stop();
 }
 
 void forward(uint8_t speed){
-	digitalWrite(13,HIGH);
+	//digitalWrite(13,HIGH);
 	base.forward(speed);
 }
 

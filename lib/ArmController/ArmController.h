@@ -18,11 +18,11 @@
 // Limits
 #define ARM_H_MIN 0
 #define ARM_H_MAX 180
-#define ARM_V_MIN 60
+#define ARM_V_MIN 70
 #define ARM_V_MAX 180
-#define WRIST_MIN 60
+#define WRIST_MIN 0
 #define WRIST_MAX 180
-#define GRASP_MIN 0
+#define GRASP_MIN 50
 #define GRASP_MAX 180
 
 // Default step in degrees for relative movement
