@@ -88,7 +88,7 @@ float HMC6352::get_heading(uint8_t samples){
 
     float heading = sorted_data[samples / 2];
     
-    /*// If we have enough samples, return the mean of the medium ones
+    /*// If we have enough samples, return the mean of the ones in the middle
     if (samples >= 7){
         for (int i = 0; i < 2; ++i){
             heading += sorted_data[samples/2 + i];
@@ -149,7 +149,7 @@ uint8_t HMC6352::read_EEPROM(uint8_t mem_address){
     
     // Check if calibration or sleeping states are active
     if (state_ != OPERATING){
-        return;
+        return 0;
     }
 
     uint8_t data = 0;
