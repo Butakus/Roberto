@@ -14,16 +14,18 @@
 HMC5883L::HMC5883L(){
     address_ = HMC5883L_ADDR >> 1;
     Wire.begin();
-
-    Wire.beginTransmission(address_);
-    Wire.write((uint8_t)0x02);
-    Wire.write((uint8_t)0x00);
-    Wire.endTransmission();
 }
 
 
 HMC5883L::~HMC5883L(){}
 
+
+void HMC5883L::begin(){
+    Wire.beginTransmission(address_);
+    Wire.write((uint8_t)0x02);
+    Wire.write((uint8_t)0x00);
+    Wire.endTransmission();
+}
 
 float HMC5883L::get_heading(){
 
@@ -85,6 +87,7 @@ float HMC5883L::get_heading(uint8_t samples){
             sorted_data[k] = sorted_data[k-1];
         }
         sorted_data[insert_pos] = cur_heading;
+        delay(5);
     }
 
     float heading = sorted_data[samples / 2];

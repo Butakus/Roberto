@@ -23,6 +23,7 @@ class HMC5883L{
 public:
     HMC5883L();
     ~HMC5883L();
+    void begin();
     float get_heading();
     float get_heading(uint8_t samples);
     uint8_t read_EEPROM(uint8_t mem_address);
