@@ -3,3 +3,9 @@
 
 # Logs
 *.log
+
+# Python compiled
+*.pyc
+
+# Gedit trash
+*~
