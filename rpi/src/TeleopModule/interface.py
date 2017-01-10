@@ -1,9 +1,20 @@
-""" TODO: EVERYTHING
+""" TODO: Doc
 """
 
 from time import sleep
-from driver_comm import ArdPiComm
 from master_comm import MasterComm
+
+# Roberto modules
+# Include roberto library dir to python path
+import sys, os.path, inspect
+current_path = os.path.realpath(os.path.dirname((inspect.getfile(inspect.currentframe()))))
+base_path = ""
+while base_path != "rpi":
+	current_path, base_path = os.path.split(current_path)
+sys.path.insert(1, os.path.realpath(os.path.join(current_path, base_path, "lib")))
+
+# Import modules from rpi/lib
+from driver_comm import ArdPiComm
 
 """ Commands received from master:
 	stop
