@@ -47,7 +47,7 @@ void Motor::setup(uint8_t pin1, uint8_t pin2, uint8_t enable){
 }
 
 void Motor::set_speed(uint8_t speed){
-	_speed = speed;
+	_speed = constrain(speed, 0, 255);
 	analogWrite(_en, _speed);
 }
 

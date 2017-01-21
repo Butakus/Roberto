@@ -2,10 +2,10 @@
 *
 *  Note: Works only on version 1.0 and above of Arduino IDE. (only arduino.h)
 *
-*  Author:	Francisco Miguel Moreno
-*  Email:	butakus@gmail.com
-*  Version:	0.1
-*  Date:	04/11/2015
+*  Author:  Francisco Miguel Moreno
+*  Email:   butakus@gmail.com
+*  Version: 0.1
+*  Date:    04/11/2015
 */
 
 #include <Motor.h>
@@ -24,25 +24,25 @@ Motor mB(pin_B1,pin_B2,pin_enB);
 RobotBase base(&mB, &mA);
 
 void setup(){
-	base.set_speed(255);
-	base.stop();
+    base.set_speed(255);
+    base.stop();
 }
 
 void loop(){
-	base.forward();
-	delay(2000);
-	base.stop();
-	delay(1000);
-	base.backward();
-	delay(2000);
-	base.stop();
-	delay(1000);
-	base.left();
-	delay(2000);
-	base.stop();
-	delay(1000);
-	base.right();
-	delay(2000);
-	base.stop();
-	delay(5000);
+    base.forward();
+    delay(2000);
+    base.stop();
+    delay(1000);
+    base.backward();
+    delay(2000);
+    base.stop();
+    delay(1000);
+    base.left();
+    delay(2000);
+    base.stop();
+    delay(1000);
+    base.right();
+    delay(2000);
+    base.stop();
+    delay(5000);
 }
