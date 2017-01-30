@@ -12,36 +12,134 @@ from threading import Thread
 ACK_COMMAND = 0x01
 MAX_RETRIES = 3
 
+START_FLAG = 0x7E
+ESCAPE_FLAG = 0x7D
+
 class PacketFrame(object):
     """ Class to implement the packet frame functionality """
-    # TODO
     def __init__(self, seq_number, command, payload):
         self.seq_number = seq_number
         self.command = command
         self.payload_length = len(payload)
         self.payload = payload
 
+    def invert_bit_5(self, val):
+        """ Invert the 5th bit """
+        if val == START_FLAG or val == ESCAPE_FLAG:
+            mask = 1 << 5
+            val ^= mask
+        return val        
+
+    def check_flag_conflict(self, val):
+        """ Check if val conflicts with one of the flags """
+        return val == START_FLAG or val == ESCAPE_FLAG
+
     def serialize(self):
-        # Convert the object to a byte array to send it over the serial port and add the checksum
-        # TODO
-        pass
+        """ Convert the object to a byte string to send it over the serial port and add the checksum """
+        data = ""
+        # Start
+        data += chr(START_FLAG)
+        
+        # Sequence number
+        if self.check_flag_conflict(self.seq_number):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(self.seq_number))    
+        else:
+            data += chr(self.seq_number)
+        
+        # Command
+        if self.check_flag_conflict(self.command):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(self.command))    
+        else:
+            data += chr(self.command)
+        
+        # Payload length
+        if self.check_flag_conflict(self.payload_length):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(self.payload_length))    
+        else:
+            data += chr(self.payload_length)
 
-    def __checksum(self):
-        # Compute the checksum of the data
-        pass
+        # Payload
+        for i in xrange(payload_length):
+            if self.check_flag_conflict(self.payload[i]):
+                data += chr(ESCAPE_FLAG)
+                data += chr(self.invert_bit_5(self.payload[i]))    
+            else:
+                data += chr(self.payload[i])
 
-class PacketFrame(object):
+        # Checksum
+        checksum_msb, checksum_lsb = self.checksum()
+
+        if self.check_flag_conflict(checksum_msb):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(checksum_msb))    
+        else:
+            data += chr(checksum_msb)
+        if self.check_flag_conflict(checksum_lsb):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(checksum_lsb))    
+        else:
+            data += chr(checksum_lsb)
+
+        # End
+        data += chr(START_FLAG)
+
+        return data
+
+
+    def checksum(self):
+        """ Compute the 16bit Fletcher's checksum of the data """
+        lsb = 0
+        msb = 0
+        lsb += self.seq_number
+        msb += lsb
+        lsb += self.command
+        msb += lsb
+        lsb += self.payload_length
+        msb += lsb
+        for i in xrange(self.payload_length):
+            lsb += self.payload[i]
+            msb += lsb
+            if i % 32 == 0:
+                # Do a reduction each 16 bytes
+                lsb = (lsb & 0xFF) + (lsb >> 8)
+                msb = (msb & 0xFF) + (msb >> 8)
+        # Last double reduction to add the carry
+        lsb = (lsb & 0xFF) + (lsb >> 8)
+        lsb = (lsb & 0xFF) + (lsb >> 8)
+        msb = (msb & 0xFF) + (msb >> 8)
+        msb = (msb & 0xFF) + (msb >> 8)
+        return msb, lsb
+
+
+class ACKFrame(PacketFrame):
     """ Class to implement the ACK frame functionality """
-    # TODO
     def __init__(self, seq_number, command):
         self.seq_number = seq_number
         self.command = ACK_COMMAND
-        self.payload_length = 0
 
     def serialize(self):
-        # Convert the object to a byte array to send it over the serial port and add the checksum
-        # TODO
-        pass
+        """ Convert the object to a byte string to send it over the serial port and add the checksum """
+        data = ""
+        # Start
+        data += chr(START_FLAG)
+        
+        # Sequence number
+        if self.check_flag_conflict(self.seq_number):
+            data += chr(ESCAPE_FLAG)
+            data += chr(self.invert_bit_5(self.seq_number))    
+        else:
+            data += chr(self.seq_number)
+        
+        # Command
+        data += chr(self.command)
+
+        # End
+        data += chr(START_FLAG)
+ 
+        return data
 
 class ArdPiComm(Thread):
     """Class to handle the serial object and implement the communication protocol"""
