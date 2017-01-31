@@ -119,7 +119,7 @@ class PacketFrame(object):
 
 class ACKFrame(PacketFrame):
     """ Class to implement the ACK frame functionality """
-    def __init__(self, seq_number, command):
+    def __init__(self, seq_number):
         self.seq_number = seq_number
         self.command = ACK_COMMAND
 
@@ -188,10 +188,10 @@ class ArdPiComm(Thread):
                         self.process_frame(frame_data)
                         # Clear the current buffer
                         in_buffer = []
-            sleep(0.01) # 10ms sleep
+            else:
+                sleep(0.01) # 10ms sleep
 
     def process_frame(self, data):
-        # TODO 
         """ Get the byte array, create its corresponding frame object and process it """
         # Restore the escaped bytes
         escaped_data = []
@@ -202,17 +202,41 @@ class ArdPiComm(Thread):
                 b = invert_bit_5(data_iter.next())
             escaped_data.append(b)
 
+        seq_number = escaped_data[1]
         command = escaped_data[2]
 
         if command == ACK_COMMAND:
-            # TODO: Create ACKFrame and store it
-            pass
+            # Create ACKFrame and store it
+            self.last_ack = ACKFrame(seq_number)
         else:
-            # TODO: Check checksum.
-            # TODO: send ACK.
-            # TODO: Process packet.
-            pass
+            retry = False
+            payload_length = escaped_data[3]
+            payload = escaped_data[4:-3]
+            # Verify length
+            if len(payload) != payload_length:
+                retry = True
+                print "Packet payload mismatch"
+            packet = PacketFrame(seq_number, command, payload)
+            
+            # Check checksum
+            received_checksum = (escaped_data[-3], escaped_data[-2])
+            computed_checksum = packet.checksum()
+            if received_checksum[0] != computed_checksum[0] or received_checksum[1] != computed_checksum[1]:
+                # TODO: Recover error
+                retry = True
+                print "Packet checksum mismatch"
+            
+            # Send ACK.
+            if retry:
+                # Reset the ack packet number to indicate retransmission
+                self.send_frame(ACKFrame(seq_number))
+            else:
+                self.send_frame(ACKFrame(seq_number + 1))
 
+                # Process the packet in a different thread to avoid blocking the main (receiving) thread
+                t = Thread(target=self.callback, args=((command, payload)))
+                t.daemon = True
+                t.start()
 
 
     def stop(self):
@@ -225,6 +249,11 @@ class ArdPiComm(Thread):
             print 'Serial port closed.'
         else:
             print 'Serial port is already closed.'
+
+    def send_frame(self, frame):
+        # TODO
+        """ Send a frame object to the serial port """
+        pass
 
     def send(self, command, argument=0):
 
