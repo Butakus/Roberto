@@ -15,6 +15,19 @@ MAX_RETRIES = 3
 START_FLAG = 0x7E
 ESCAPE_FLAG = 0x7D
 
+
+def check_flag_conflict(val):
+    """ Check if the byte conflicts with one of the flags """
+    return val == START_FLAG or val == ESCAPE_FLAG
+
+def invert_bit_5(val):
+    """ Invert the 5th bit """
+    if val == START_FLAG or val == ESCAPE_FLAG:
+        mask = 1 << 5
+        val ^= mask
+    return val
+
+
 class PacketFrame(object):
     """ Class to implement the packet frame functionality """
     def __init__(self, seq_number, command, payload):
@@ -23,16 +36,6 @@ class PacketFrame(object):
         self.payload_length = len(payload)
         self.payload = payload
 
-    def invert_bit_5(self, val):
-        """ Invert the 5th bit """
-        if val == START_FLAG or val == ESCAPE_FLAG:
-            mask = 1 << 5
-            val ^= mask
-        return val        
-
-    def check_flag_conflict(self, val):
-        """ Check if val conflicts with one of the flags """
-        return val == START_FLAG or val == ESCAPE_FLAG
 
     def serialize(self):
         """ Convert the object to a byte string to send it over the serial port and add the checksum """
@@ -41,45 +44,45 @@ class PacketFrame(object):
         data += chr(START_FLAG)
         
         # Sequence number
-        if self.check_flag_conflict(self.seq_number):
+        if check_flag_conflict(self.seq_number):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(self.seq_number))    
+            data += chr(invert_bit_5(self.seq_number))    
         else:
             data += chr(self.seq_number)
         
         # Command
-        if self.check_flag_conflict(self.command):
+        if check_flag_conflict(self.command):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(self.command))    
+            data += chr(invert_bit_5(self.command))    
         else:
             data += chr(self.command)
         
         # Payload length
-        if self.check_flag_conflict(self.payload_length):
+        if check_flag_conflict(self.payload_length):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(self.payload_length))    
+            data += chr(invert_bit_5(self.payload_length))    
         else:
             data += chr(self.payload_length)
 
         # Payload
         for i in xrange(payload_length):
-            if self.check_flag_conflict(self.payload[i]):
+            if check_flag_conflict(self.payload[i]):
                 data += chr(ESCAPE_FLAG)
-                data += chr(self.invert_bit_5(self.payload[i]))    
+                data += chr(invert_bit_5(self.payload[i]))    
             else:
                 data += chr(self.payload[i])
 
         # Checksum
         checksum_msb, checksum_lsb = self.checksum()
 
-        if self.check_flag_conflict(checksum_msb):
+        if check_flag_conflict(checksum_msb):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(checksum_msb))    
+            data += chr(invert_bit_5(checksum_msb))    
         else:
             data += chr(checksum_msb)
-        if self.check_flag_conflict(checksum_lsb):
+        if check_flag_conflict(checksum_lsb):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(checksum_lsb))    
+            data += chr(invert_bit_5(checksum_lsb))    
         else:
             data += chr(checksum_lsb)
 
@@ -127,9 +130,9 @@ class ACKFrame(PacketFrame):
         data += chr(START_FLAG)
         
         # Sequence number
-        if self.check_flag_conflict(self.seq_number):
+        if check_flag_conflict(self.seq_number):
             data += chr(ESCAPE_FLAG)
-            data += chr(self.invert_bit_5(self.seq_number))    
+            data += chr(invert_bit_5(self.seq_number))    
         else:
             data += chr(self.seq_number)
         
@@ -168,11 +171,49 @@ class ArdPiComm(Thread):
 
 
     def run(self):
-        # TODO
-        # Receive all incoming bytes and pack them in frames
-        # If the frame is an ack message, put it in the ACK buffer
-        # If it is another message, process it with the message callback
-        pass    
+        """ Receive all incoming bytes and pack them in frames
+            If the frame is an ack message, put it in the ACK buffer
+            If it is another message, process it with the message callback
+        """
+        in_buffer = []
+        while (self.running):
+            if self.ser.inWaiting() > 0:
+                b = ord(self.ser.read(1))
+                in_buffer.append(b)
+                if b == START_FLAG:
+                    # Get number of bytes between start flags to skip ghost frames (between end_flag and start_flag)
+                    if (len(in_buffer) - 1) > 2:
+                        # Process frame
+                        frame_data = in_buffer[:]
+                        self.process_frame(frame_data)
+                        # Clear the current buffer
+                        in_buffer = []
+            sleep(0.01) # 10ms sleep
+
+    def process_frame(self, data):
+        # TODO 
+        """ Get the byte array, create its corresponding frame object and process it """
+        # Restore the escaped bytes
+        escaped_data = []
+        data_iter = data.__iter__()
+        for i in data_iter:
+            b = i
+            if i == ESCAPE_FLAG:
+                b = invert_bit_5(data_iter.next())
+            escaped_data.append(b)
+
+        command = escaped_data[2]
+
+        if command == ACK_COMMAND:
+            # TODO: Create ACKFrame and store it
+            pass
+        else:
+            # TODO: Check checksum.
+            # TODO: send ACK.
+            # TODO: Process packet.
+            pass
+
+
 
     def stop(self):
         # Stop the thread and close the serial port
