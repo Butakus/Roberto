@@ -25,9 +25,8 @@ def check_flag_conflict(val):
 
 def invert_bit_5(val):
     """ Invert the 5th bit """
-    if val == START_FLAG or val == ESCAPE_FLAG:
-        mask = 1 << 5
-        val ^= mask
+    mask = 1 << 5
+    val ^= mask
     return val
 
 
@@ -194,7 +193,7 @@ class ArdPiComm(Thread):
                         in_buffer = []
             else:
                 sleep(0.01) # 10ms sleep
-        
+
         """ Code to test raw data received (without frame formatting)
         in_buffer = []
         while (self.running):
@@ -245,7 +244,7 @@ class ArdPiComm(Thread):
                 # Reset the ack packet number to indicate retransmission
                 self.send_frame(ACKFrame(seq_number))
             else:
-                self.send_frame(ACKFrame(seq_number + 1))
+                self.send_frame(ACKFrame((seq_number + 1) % 256))
 
                 # Process the packet in a different thread to avoid blocking the main (receiving) thread
                 t = Thread(target=self.callback, args=((command, payload)))
@@ -313,7 +312,7 @@ class ArdPiComm(Thread):
             print "Payload length exceded. Frame cannot be sent"
             return False
 
-        self.sent_seq += 1
+        self.sent_seq = (self.sent_seq + 1) % 256
 
         # Create the Packet frame
         frame = PacketFrame(self.sent_seq, command, payload)
