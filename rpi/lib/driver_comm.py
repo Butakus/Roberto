@@ -6,11 +6,13 @@
 
 import serial
 import sys
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
-ACK_COMMAND = 0x01
 MAX_RETRIES = 3
+TIMEOUT = 3.0 # seconds
+
+ACK_COMMAND = 0x01
 
 START_FLAG = 0x7E
 ESCAPE_FLAG = 0x7D
@@ -19,6 +21,7 @@ ESCAPE_FLAG = 0x7D
 def check_flag_conflict(val):
     """ Check if the byte conflicts with one of the flags """
     return val == START_FLAG or val == ESCAPE_FLAG
+
 
 def invert_bit_5(val):
     """ Invert the 5th bit """
@@ -31,9 +34,9 @@ def invert_bit_5(val):
 class PacketFrame(object):
     """ Class to implement the packet frame functionality """
     def __init__(self, seq_number, command, payload):
-        self.seq_number = seq_number
-        self.command = command
-        self.payload_length = len(payload)
+        self.seq_number = seq_number & 0xFF
+        self.command = command & 0xFF
+        self.payload_length = len(payload) & 0xFF
         self.payload = payload
 
 
@@ -65,7 +68,7 @@ class PacketFrame(object):
             data += chr(self.payload_length)
 
         # Payload
-        for i in xrange(payload_length):
+        for i in xrange(self.payload_length):
             if check_flag_conflict(self.payload[i]):
                 data += chr(ESCAPE_FLAG)
                 data += chr(invert_bit_5(self.payload[i]))    
@@ -144,13 +147,14 @@ class ACKFrame(PacketFrame):
  
         return data
 
+
 class ArdPiComm(Thread):
     """Class to handle the serial object and implement the communication protocol"""
     
     def __init__(self, message_callback, port='/dev/ttyACM0', baudrate=9600):
         self.sent_seq = 0
-        self.recv_seq = 0
         self.last_ack = None
+        self.retries = 0
         self.callback = message_callback
 
         print 'Connecting to serial port...'
@@ -190,6 +194,17 @@ class ArdPiComm(Thread):
                         in_buffer = []
             else:
                 sleep(0.01) # 10ms sleep
+        
+        """ Code to test raw data received (without frame formatting)
+        in_buffer = []
+        while (self.running):
+            if self.ser.inWaiting() > 0:
+                b = ord(self.ser.read(1))
+                in_buffer.append(b)
+                print "Buffer: {}".format(in_buffer)
+            sleep(0.01)
+        """
+
 
     def process_frame(self, data):
         """ Get the byte array, create its corresponding frame object and process it """
@@ -222,7 +237,6 @@ class ArdPiComm(Thread):
             received_checksum = (escaped_data[-3], escaped_data[-2])
             computed_checksum = packet.checksum()
             if received_checksum[0] != computed_checksum[0] or received_checksum[1] != computed_checksum[1]:
-                # TODO: Recover error
                 retry = True
                 print "Packet checksum mismatch"
             
@@ -250,54 +264,75 @@ class ArdPiComm(Thread):
         else:
             print 'Serial port is already closed.'
 
+
     def send_frame(self, frame):
-        # TODO
         """ Send a frame object to the serial port """
-        pass
+        # Reset the last ACK
+        self.last_ack = None
 
-    def send(self, command, argument=0):
+        # Serialize the Packet data
+        data = frame.serialize()
 
-        retries = 0
-        command = command & 0xFF
-        argument = argument & 0xFF
+        # Split data in 64 bytes blocks
+        while len(data) > 64:
+            self.ser.write(data[:64])
+            data = data[64:]
+            # Wait for the arduino to read the buffer, so it does not overflow
+            sleep(0.05)
+        # Write the rest of the data
+        self.ser.write(data)
 
-        print 'Sending command {c}, with argument {a}'.format(c=command, a=argument)
-
-        self.ser.write(chr(command))
-        self.ser.write(chr(argument))
-        
-        while self.check_ack() == 0 and retries < MAX_RETRIES:
-            self.ser.write(chr(command))
-            self.ser.write(chr(argument))
-            retries += 1
-            sleep(0.1) # 100ms between each retry
-
-
-        if retries == MAX_RETRIES:
-            # No ACK after MAX_RETRIES
-            print 'Could not send command {c}, with argument {a}'.format(c=command, a=argument)
-            return False
+        # Wait for the ACK
+        sent_time = time()
+        while not self.last_ack:
+            # Check for the timeout, so it does not stay here forever
+            if (time() - sent_time) >= TIMEOUT:
+                print "Timeout exceeded."
+                print "Did not received the ACK for packet {n} with command {c}".format(n=frame.seq_number, c=frame.command)
+                return False
+            sleep(0.01)
+        # Check the ACK and retry if needed
+        if self.last_ack.seq_number == frame.seq_number:
+            # Retry
+            self.retries += 1
+            if self.retries >= 3:
+                print 'Could not send packet {n} with command {c}'.format(c=frame.command, n=frame.seq_number)
+                return False
+            else:
+                return self.send_frame(frame)
         else:
+            # ACK OK
+            self.retries = 0
             return True
 
-    def pack_frame(self, command, payload):
-        # TODO
-        # Pack all bytes in the frame. Insert escape bytes when necessary and add checksum
-        pass
 
-    def check_ack(self):
-        print 'Receiving ACK...'
-        ack = 0
-        if self.ser.inWaiting() > 0:
-            ack = ord(self.ser.read(1))
-        print 'ACK received: {}'.format(ack)
-        return ack
+    def send(self, command, payload=[]):
+        """ Send a packet given the command and the payload """
+        command = command & 0xFF
+        if len(payload) > 255:
+            print "Payload length exceded. Frame cannot be sent"
+            return False
+
+        self.sent_seq += 1
+
+        # Create the Packet frame
+        frame = PacketFrame(self.sent_seq, command, payload)
+        print 'Sending packet {n} with command {c}'.format(c=command, n=self.sent_seq)
+
+        return self.send_frame(frame)
+
+
+
+def test_callback(command, payload):
+    print "Command received: {}".format(command)
+    print "Payload:"
+    print payload
+
 
 if __name__ == '__main__':
     # Test
-    # TODO: Reimplement the test with the new protocol version
-    """
-    comm = ArdPiComm()
+    comm = ArdPiComm(test_callback)
+    comm.start()
     while True:
         command = raw_input()
         if command == 's':
@@ -305,9 +340,11 @@ if __name__ == '__main__':
             comm.send(0x00)
         elif command == 'f':
             print 'Sending forward command'
-            comm.send(0x03, 50)
+            comm.send(0x03, [50, 50])
+        elif command == 'a':
+            print 'Sending ACK'
+            comm.send_frame(ACKFrame(1))
         elif command == 'q':
             break
     comm.stop()
-    """
 
