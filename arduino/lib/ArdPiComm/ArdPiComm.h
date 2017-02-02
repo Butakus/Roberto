@@ -16,6 +16,7 @@
 
 #include <Arduino.h>
 
+#define BAUDRATE 9600
 #define COMM_TIMEOUT 3000
 #define MAX_RETRIES 3
 
@@ -47,13 +48,14 @@ private:
 
     uint8_t _command;
     uint8_t _payload[64];
+    uint8_t _payload_size;
     uint8_t _sent_seq;
     uint8_t _last_ack;
     uint8_t _retries;
     uint32_t _start_time;
 
     void process_frame(uint8_t start, uint8_t end);
-    void invert_bit_5(uint8_t val);
+    void invert_bit_5(uint8_t* val);
     void check_flag_conflict(uint8_t val);
     uint8_t wait_ack();
     void send_ack(uint8_t seq_number);
