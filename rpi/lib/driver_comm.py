@@ -9,6 +9,7 @@ import sys
 from time import sleep, time
 from threading import Thread
 
+BAUDRATE = 9600
 MAX_RETRIES = 3
 TIMEOUT = 3.0 # seconds
 
@@ -25,9 +26,7 @@ def check_flag_conflict(val):
 
 def invert_bit_5(val):
     """ Invert the 5th bit """
-    mask = 1 << 5
-    val ^= mask
-    return val
+    return val ^ (1 << 5)
 
 
 class PacketFrame(object):
@@ -150,7 +149,7 @@ class ACKFrame(PacketFrame):
 class ArdPiComm(Thread):
     """Class to handle the serial object and implement the communication protocol"""
     
-    def __init__(self, message_callback, port='/dev/ttyACM0', baudrate=9600):
+    def __init__(self, message_callback, port='/dev/ttyACM0', baudrate=BAUDRATE):
         self.sent_seq = 0
         self.last_ack = None
         self.retries = 0
@@ -281,6 +280,10 @@ class ArdPiComm(Thread):
         # Write the rest of the data
         self.ser.write(data)
 
+        # Do not wait for ACK after sending an ACK frame
+        if frame.command == ACK_COMMAND:
+            return True
+
         # Wait for the ACK
         sent_time = time()
         while not self.last_ack:
@@ -294,7 +297,7 @@ class ArdPiComm(Thread):
         if self.last_ack.seq_number == frame.seq_number:
             # Retry
             self.retries += 1
-            if self.retries >= 3:
+            if self.retries >= MAX_RETRIES:
                 print 'Could not send packet {n} with command {c}'.format(c=frame.command, n=frame.seq_number)
                 return False
             else:
