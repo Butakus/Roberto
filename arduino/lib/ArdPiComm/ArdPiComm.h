@@ -61,11 +61,13 @@ public:
     uint8_t read();
 
     /* Send a packet given the command and the payload */
-    TX_Error send(uint8_t command, uint8_t payload_size, uint8_t* payload);
+    TX_Error send(uint8_t command, uint8_t payload_size, uint8_t payload[]);
+    /* Send a packet given with just a command */
+    TX_Error send(uint8_t command);
 
     /* Get the data from the last packet received */
     uint8_t get_command();
-    uint8_t get_payload(uint8_t* payload);
+    uint8_t get_payload(uint8_t payload[]);
     
 private:
     Stream *_serial;
@@ -92,7 +94,7 @@ private:
     void send_ack(uint8_t seq_number);
 
     /* Compute the 16bit Fletcher's checksum of the data */
-    uint16_t checksum(uint8_t seq_number, uint8_t command, uint8_t payload_size, uint8_t* payload);
+    uint16_t checksum(uint8_t seq_number, uint8_t command, uint8_t payload_size, uint8_t payload[]);
 };
 
 #endif

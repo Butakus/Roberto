@@ -14,10 +14,8 @@
 #include <ArdPiComm.h>
 
 ArdPiComm comms;
-uint8_t payload[64];
 
-void setup()
-{
+void setup(){
     Serial.begin(9600);
     comms.begin(&Serial);
 
@@ -34,30 +32,4 @@ void setup()
     comms.send(0x06, 4, arr);
 }
 
-void loop()
-{
-    if (comms.read())
-    {
-        uint8_t command = comms.get_command();
-        uint8_t payload_size = comms.get_payload(payload);
-        if (command == 0x03 || command == 0x7E)
-        {
-            if (payload_size == 2)
-            {
-                if (payload[0] > payload[1])
-                {
-                    digitalWrite(13, HIGH);
-                }
-            }
-            else
-            {
-                digitalWrite(13, HIGH);
-            }
-        }
-        else if (command == 0x00)
-        {
-            digitalWrite(13, LOW);
-        }
-    }
-    delay(5);
-}
+void loop(){}

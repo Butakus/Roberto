@@ -342,7 +342,10 @@ if __name__ == '__main__':
             comm.send(0x00)
         elif command == 'f':
             print 'Sending forward command'
-            comm.send(0x03, [50, 50])
+            comm.send(0x03, [55, 50])
+        elif command == 'e':
+            print 'Sending flag command'
+            comm.send(START_FLAG, [125])
         elif command == 'a':
             print 'Sending ACK'
             comm.send_frame(ACKFrame(1))

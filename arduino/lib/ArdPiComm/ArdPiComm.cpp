@@ -21,7 +21,7 @@ ArdPiComm::ArdPiComm()
     _start_time = 0;
     _payload_size = 0;
     _sent_seq = 0;
-    _last_ack = 0;
+    _last_ack = ACK_UNSET;
     _retries = 0;
 }
 
@@ -59,7 +59,7 @@ uint8_t ArdPiComm::read()
 
 
 /* Send a packet given the command and the payload */
-TX_Error ArdPiComm::send(uint8_t command, uint8_t payload_size, uint8_t* payload)
+TX_Error ArdPiComm::send(uint8_t command, uint8_t payload_size, uint8_t payload[])
 {
     
     _sent_seq = (_sent_seq + 1) % 256;
@@ -176,15 +176,25 @@ TX_Error ArdPiComm::send(uint8_t command, uint8_t payload_size, uint8_t* payload
 }
 
 
+/* Send a packet with just a command */
+TX_Error ArdPiComm::send(uint8_t command)
+{
+    return send(command, 0, NULL);
+}
+
+
 uint8_t ArdPiComm::get_command()
 {
     return _command;
 }
 
 
-uint8_t ArdPiComm::get_payload(uint8_t* payload)
+uint8_t ArdPiComm::get_payload(uint8_t payload[])
 {
-    payload = _payload;
+	for (int i = 0; i < _payload_size; ++i)
+	{
+	    payload[i] = _payload[i];
+	}
     return _payload_size;
 }
 
@@ -295,11 +305,14 @@ void ArdPiComm::send_ack(uint8_t seq_number)
     
     // Command
     _serial->write(ACK_COMMAND);
+
+    // End flag
+    _serial->write(START_FLAG);
 }
 
 
 /* Compute the 16bit Fletcher's checksum of the data */
-uint16_t ArdPiComm::checksum(uint8_t seq_number, uint8_t command, uint8_t payload_size, uint8_t* payload)
+uint16_t ArdPiComm::checksum(uint8_t seq_number, uint8_t command, uint8_t payload_size, uint8_t payload[])
 {
     uint16_t lsb = 0;
     uint16_t  msb = 0;
