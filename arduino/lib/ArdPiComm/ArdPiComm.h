@@ -16,7 +16,7 @@
 
 #include <Arduino.h>
 
-#define BAUDRATE 9600
+#define BAUDRATE 57600
 #define TIMEOUT 3000
 #define MAX_RETRIES 3
 

@@ -9,7 +9,7 @@ import sys
 from time import sleep, time
 from threading import Thread
 
-BAUDRATE = 9600
+BAUDRATE = 57600
 MAX_RETRIES = 3
 TIMEOUT = 3.0 # seconds
 
@@ -158,6 +158,8 @@ class ArdPiComm(Thread):
         print 'Connecting to serial port...'
         try:
             self.ser = serial.Serial(port=port, baudrate=baudrate)
+            # Wait for the arduino to init
+            sleep(1)
         except serial.serialutil.SerialException:
             print '\nSerial device not connected. Program aborted.\n'
             sys.exit(1)
@@ -301,6 +303,7 @@ class ArdPiComm(Thread):
                 print 'Could not send packet {n} with command {c}'.format(c=frame.command, n=frame.seq_number)
                 return False
             else:
+                print "Received ACK with retry code. Retrying packet {n}...".format(n=frame.seq_number)
                 return self.send_frame(frame)
         else:
             # ACK OK
@@ -325,7 +328,12 @@ class ArdPiComm(Thread):
 
 
 
+last_rx_time = 0
 def test_callback(command, payload):
+    global last_rx_time
+    print "Time since last packet: {}".format(time() - last_rx_time)
+    last_rx_time = time()
+
     print "Command received: {}".format(command)
     print "Payload:"
     print payload
@@ -335,6 +343,15 @@ if __name__ == '__main__':
     # Test
     comm = ArdPiComm(test_callback)
     comm.start()
+
+    """ Test TX max speed
+    t1 = time()
+    while time() - t1 < 10:
+        t2 = time()
+        comm.send(0x06, [1, 4, 70, 65])
+        print "Packet TX time: {}".format(time() - t2)
+    """
+
     while True:
         command = raw_input()
         if command == 's':

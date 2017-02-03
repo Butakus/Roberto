@@ -16,7 +16,7 @@
 ArdPiComm comms;
 
 void setup(){
-    Serial.begin(9600);
+    Serial.begin(BAUDRATE);
     comms.begin(&Serial);
 
     pinMode(13, OUTPUT);

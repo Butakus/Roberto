@@ -18,7 +18,7 @@ uint8_t payload[64];
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(BAUDRATE);
     comms.begin(&Serial);
 
     pinMode(13, OUTPUT);

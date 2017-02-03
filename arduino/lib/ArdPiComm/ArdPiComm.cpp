@@ -273,7 +273,7 @@ TX_Error ArdPiComm::wait_ack()
     TX_Error error = NO_ERROR;
     while (_last_ack == ACK_UNSET)
     {
-        if ((millis() - start_time) < TIMEOUT)
+        if ((millis() - start_time) > TIMEOUT)
         {
             error = TIMEOUT_ERROR;
             break;
