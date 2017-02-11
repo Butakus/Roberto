@@ -153,13 +153,14 @@ class ArdPiComm(Thread):
         self.sent_seq = 0
         self.last_ack = None
         self.retries = 0
+        self.serial_lock = False
         self.callback = message_callback
 
         print 'Connecting to serial port...'
         try:
             self.ser = serial.Serial(port=port, baudrate=baudrate)
             # Wait for the arduino to init
-            sleep(1)
+            sleep(2)
         except serial.serialutil.SerialException:
             print '\nSerial device not connected. Program aborted.\n'
             sys.exit(1)
@@ -268,19 +269,28 @@ class ArdPiComm(Thread):
     def send_frame(self, frame):
         """ Send a frame object to the serial port """
         # Reset the last ACK
-        self.last_ack = None
+        if frame.command != ACK_COMMAND:
+            self.last_ack = None
 
         # Serialize the Packet data
         data = frame.serialize()
 
-        # Split data in 64 bytes blocks
-        while len(data) > 64:
-            self.ser.write(data[:64])
-            data = data[64:]
-            # Wait for the arduino to read the buffer, so it does not overflow
-            sleep(0.05)
-        # Write the rest of the data
-        self.ser.write(data)
+        # Wait until the lock is released
+        while self.serial_lock:
+            sleep(0.005)
+        try:
+            self.serial_lock = True
+            # Split data in 64 bytes blocks
+            while len(data) > 64:
+                self.ser.write(data[:64])
+                data = data[64:]
+                # Wait for the arduino to read the buffer, so it does not overflow
+                sleep(0.05)
+            # Write the rest of the data
+            self.ser.write(data)
+            # Release the serial lock
+        finally:
+            self.serial_lock = False
 
         # Do not wait for ACK after sending an ACK frame
         if frame.command == ACK_COMMAND:
@@ -331,12 +341,12 @@ class ArdPiComm(Thread):
 last_rx_time = 0
 def test_callback(command, payload):
     global last_rx_time
-    print "Time since last packet: {}".format(time() - last_rx_time)
+    print "\t\tTime since last packet: {}".format(time() - last_rx_time)
     last_rx_time = time()
 
-    print "Command received: {}".format(command)
-    print "Payload:"
-    print payload
+    print "\t\tCommand received: {}".format(command)
+    print "\t\tPayload:"
+    print "\t\t{}".format(payload)
 
 
 if __name__ == '__main__':
