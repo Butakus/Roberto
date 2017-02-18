@@ -64,10 +64,14 @@ def command_callback(command, argument):
 	else:
 		print 'Received command: {}({})'.format(command, argument)
 		print 'Sending command: {}({})'.format(DRIVER_COMMANDS[command], argument)
-		driver.send(DRIVER_COMMANDS[command], argument)
+		driver.send(DRIVER_COMMANDS[command], [argument])
+
+def rx_callback(command, payload):
+	# Ignore everything comming from the arduino
+	pass
 
 if __name__ == '__main__':
-	driver = ArdPiComm()
+	driver = ArdPiComm(rx_callback)
 	master = MasterComm(command_callback)
 	master.start()
 	print "Enter 'q' to exit"
