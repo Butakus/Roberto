@@ -7,7 +7,6 @@ d = generate_distutils_setup(
     packages=['roberto_driver'],
     package_dir={'': 'src'},
     scripts=['src/driver.py']
-
 )
 
 setup(**d)
