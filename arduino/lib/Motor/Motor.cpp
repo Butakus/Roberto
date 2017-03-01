@@ -59,13 +59,13 @@ uint8_t Motor::get_speed(){
 void Motor::right(){
 	digitalWrite(_pin1, HIGH);
 	digitalWrite(_pin2, LOW);
-	analogWrite(_en, map(_speed,0,100,0,255));
+	analogWrite(_en, _speed);
 }
 
 void Motor::left(){
 	digitalWrite(_pin1, LOW);
 	digitalWrite(_pin2, HIGH);
-	analogWrite(_en, map(_speed,0,100,0,255));	
+	analogWrite(_en, _speed);	
 }
 
 void Motor::right(uint8_t speed){
