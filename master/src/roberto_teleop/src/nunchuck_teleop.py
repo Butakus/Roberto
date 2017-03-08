@@ -18,11 +18,13 @@ def translate(val, src_min, src_max, dst_min, dst_max):
 
 
 if __name__ == '__main__':
+    rospy.init_node('nunchuck_teleop')
+
     nunchuck = NunchuckDriver()
     nunchuck.start()
     
     # Velocity publisher
-    vel_pub = rospy.Publisher("cmd_vel", Twist)
+    vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
 
     rate = rospy.Rate(40)
     try:
