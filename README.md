@@ -15,5 +15,4 @@ This will never end. What will be next?
 * Finish documentation for current software.
 * Add a "doc" directory with API information and datasheets.
 * Add libraries for different sensors.
-* Improve communication protocol for Arduino-RPi
 * Implement the base station modules for control and visualization.
