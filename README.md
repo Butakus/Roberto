@@ -8,6 +8,8 @@ The robot is currently controlled by a Raspberry Pi as main computer and an Ardu
 
 [rpi](https://github.com/Butakus/Roberto/tree/master/rpi) contains the code for the Raspberry Pi.
 
+[master](https://github.com/Butakus/Roberto/tree/master/master) contains the modules for the base station, which is an external computer used for teleoperation and monitoring.
+
 
 ## TODOs
 This will never end. What will be next?
