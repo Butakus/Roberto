@@ -51,9 +51,9 @@ void setup(){
     pinMode(13, OUTPUT);
     digitalWrite(13, HIGH);
   
-    Serial3.begin(9600);
+    Serial3.begin(BAUDRATE);
     comms.begin(&Serial3);
-  
+
     base.stop();
     base.set_speed(255);
 
@@ -65,6 +65,7 @@ void loop(){
     // digitalWrite(13, HIGH);
     // delay(500);
     // digitalWrite(13, LOW);
+    // delay(500);
 
     if (comms.read())
     {
@@ -85,5 +86,5 @@ void loop(){
             }
         }
     }
-    delay(50);
+    delay(20);
 }

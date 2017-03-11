@@ -65,7 +65,7 @@ void Motor::right(){
 void Motor::left(){
 	digitalWrite(_pin1, LOW);
 	digitalWrite(_pin2, HIGH);
-	analogWrite(_en, _speed);	
+	analogWrite(_en, _speed);
 }
 
 void Motor::right(uint8_t speed){
@@ -81,6 +81,7 @@ void Motor::left(uint8_t speed){
 void Motor::stop(){
 	digitalWrite(_pin1, LOW);
 	digitalWrite(_pin2, LOW);
+	analogWrite(_en, 0);
 }
 
 void Motor::brake(){

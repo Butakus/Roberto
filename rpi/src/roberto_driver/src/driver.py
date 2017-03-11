@@ -43,22 +43,22 @@ def velocity_callback(twist_msg):
     """ Receive velocity msgs and send the proper commands to the arduino """
     if twist_msg.linear.x > 0.01:
         # Forward
-        speed = int(100 * min(twist_msg.linear.x, 1.0))
+        speed = int(255 * min(twist_msg.linear.x, 1.0))
         rospy.logdebug("[ROBERTO_DRIVER] Moving forward at speed %f", speed)
         comms.send(DRIVER_COMMANDS["forward"], [speed])
     elif twist_msg.linear.x < - 0.01:
         # Backward
-        speed = int(-100 * max(twist_msg.linear.x, -1.0))
+        speed = int(-255 * max(twist_msg.linear.x, -1.0))
         rospy.logdebug("[ROBERTO_DRIVER] Moving backward at speed %f", speed)
         comms.send(DRIVER_COMMANDS["backward"], [speed])
     elif twist_msg.angular.z < - 0.01:
         # Right
-        speed = int(-100 * max(twist_msg.angular.z, -1.0))
+        speed = int(-255 * max(twist_msg.angular.z, -1.0))
         rospy.logdebug("[ROBERTO_DRIVER] Moving right at speed %f", speed)
         comms.send(DRIVER_COMMANDS["right"], [speed])
     elif twist_msg.angular.z > 0.01:
         # Left
-        speed = int(100 * min(twist_msg.angular.z, 1.0))
+        speed = int(255 * min(twist_msg.angular.z, 1.0))
         rospy.logdebug("[ROBERTO_DRIVER] Moving left at speed %f", speed)
         comms.send(DRIVER_COMMANDS["left"], [speed])
     else:
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     comms.start()
 
     # Subscribers
-    rospy.Subscriber("cmd_vel", Twist, velocity_callback, queue_size=5)
+    rospy.Subscriber("cmd_vel", Twist, velocity_callback, queue_size=1)
 
     rate = rospy.Rate(100)
     try:
