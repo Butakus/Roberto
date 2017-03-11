@@ -72,7 +72,7 @@ if __name__ == '__main__':
     rospy.init_node('roberto_driver')
 
     # Comms
-    comms = ArdPiComm(comms_callback)
+    comms = ArdPiComm(comms_callback, port="/dev/serial0")
     comms.start()
 
     # Subscribers

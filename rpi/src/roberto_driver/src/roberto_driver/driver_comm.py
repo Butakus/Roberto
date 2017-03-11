@@ -351,7 +351,7 @@ def test_callback(command, payload):
 
 if __name__ == '__main__':
     # Test
-    comm = ArdPiComm(test_callback)
+    comm = ArdPiComm(test_callback, port="/dev/serial0")
     comm.start()
 
     """ Test TX max speed
