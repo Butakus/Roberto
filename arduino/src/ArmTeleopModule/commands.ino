@@ -33,3 +33,49 @@ void right(uint8_t speed){
 	base.right(speed);
 }
 
+
+// Robotic arm commands:
+void arm_left(){
+	arm.move_arm_left();
+}
+
+void arm_right(){
+	arm.move_arm_right();
+}
+
+void arm_up(){
+	arm.move_arm_up();
+}
+
+void arm_down(){
+	arm.move_arm_down();
+}
+
+void arm_h_pos(uint8_t pos){
+	arm.set_arm_h_pos(pos);
+}
+
+void arm_v_pos(uint8_t pos){
+	arm.set_arm_v_pos(pos);
+}
+
+void wrist_left(){
+	arm.move_wrist_left();
+}
+
+void wrist_right(){
+	arm.move_wrist_right();
+}
+
+void wrist_pos(uint8_t pos){
+	arm.set_wrist_pos(pos);
+}
+
+void open_grasp(){
+	arm.open_grasp();
+}
+
+void close_grasp(){
+	arm.close_grasp();
+}
+

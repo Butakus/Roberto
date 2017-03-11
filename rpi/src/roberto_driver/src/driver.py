@@ -76,7 +76,7 @@ if __name__ == '__main__':
     comms.start()
 
     # Subscribers
-    rospy.Subscriber("cmd_vel", Twist, velocity_callback)
+    rospy.Subscriber("cmd_vel", Twist, velocity_callback, queue_size=5)
 
     rate = rospy.Rate(100)
     try:

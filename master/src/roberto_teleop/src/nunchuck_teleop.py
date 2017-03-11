@@ -24,9 +24,9 @@ if __name__ == '__main__':
     nunchuck.start()
     
     # Velocity publisher
-    vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+    vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
 
-    rate = rospy.Rate(40)
+    rate = rospy.Rate(10)
     try:
         while not rospy.is_shutdown():
             # Base speed
