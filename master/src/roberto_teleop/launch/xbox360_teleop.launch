@@ -1,0 +1,4 @@
+<launch>
+	<node name="joy_node" pkg="joy" type="joy_node" output="screen" />
+	<node name="xbox360_teleop" pkg="roberto_teleop" type="xbox360_teleop" output="screen" />
+</launch>
