@@ -2,29 +2,11 @@
     The Arduino code to get the data from the device is here: https://github.com/Butakus/NunchuckController
 """
 
+from nunchuck_limits import *
+
 import serial
 from time import sleep
 from threading import Thread
-
-# Nunchuck limit values
-# Accel ranges
-CHUCK_LIM_X_LEFT = 73
-CHUCK_LIM_X_LEFT_CENTER = 127
-CHUCK_LIM_X_RIGHT = -80
-CHUCK_LIM_X_RIGHT_CENTER = -128
-CHUCK_LIM_Y_UP = 70
-CHUCK_LIM_Y_UP_CENTER = 127
-CHUCK_LIM_Y_DOWN = -88
-CHUCK_LIM_Y_DOWN_CENTER = -128
-# Joy ranges
-CHUCK_LIM_JOY_X_LEFT = 24
-CHUCK_LIM_JOY_X_LEFT_CENTER = 127
-CHUCK_LIM_JOY_X_RIGHT = -30
-CHUCK_LIM_JOY_X_RIGHT_CENTER = -128
-CHUCK_LIM_JOY_Y_UP = -34
-CHUCK_LIM_JOY_Y_UP_CENTER = -128
-CHUCK_LIM_JOY_Y_DOWN = 31
-CHUCK_LIM_JOY_Y_DOWN_CENTER = 127
 
 
 class NunchuckDriver(Thread):

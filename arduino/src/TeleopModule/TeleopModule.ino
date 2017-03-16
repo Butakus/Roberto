@@ -74,16 +74,18 @@ void loop(){
         if (payload_size > 0)
         {
             // Payload contains always 1 argument byte
-            uint8_t argument = payload[0];
-
+            uint8_t speed = payload[0];
             switch (command){
-                case 0x00:  stop();                 break;
-                case 0x03:  forward(argument);      break;
-                case 0x0C:  backward(argument);     break;
-                case 0x0F:  left(argument);         break;
-                case 0x30:  right(argument);        break;
-                default:    stop();                 break;
+                case 0x03:  forward(speed);      break;
+                case 0x0C:  backward(speed);     break;
+                case 0x0F:  left(speed);         break;
+                case 0x30:  right(speed);        break;
+                default:    stop();              break;
             }
+        }
+        else
+        {
+            stop();
         }
     }
     delay(20);

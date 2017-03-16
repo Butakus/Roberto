@@ -1,1 +1,1 @@
-__all__ = ['nunchuck_driver']
+__all__ = ['nunchuck_driver', 'nunchuck_limits']

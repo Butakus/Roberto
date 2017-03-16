@@ -3,6 +3,7 @@
 """ Teleoperation module that uses the values from the nunchuck accelerometer to compute the speed commands """
 
 from nunchuck_driver.nunchuck_driver import *
+from nunchuck_driver.nunchuck_limits import *
 
 import rospy
 from geometry_msgs.msg import Twist
