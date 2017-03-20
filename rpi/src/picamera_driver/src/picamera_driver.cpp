@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
     image_transport::ImageTransport it(nh);
 
     int width, height;
+    double framerate;
+    priv_nh.param("framerate", framerate, 10.0);
     priv_nh.param("width", width, 640);
     priv_nh.param("height", height, 480);
 
@@ -31,7 +33,7 @@ int main(int argc, char *argv[])
 
     cv::Mat frame;
 
-    ros::Rate rate(10.0);
+    ros::Rate rate(framerate);
     while (ros::ok())
     {
         // Get the current frame

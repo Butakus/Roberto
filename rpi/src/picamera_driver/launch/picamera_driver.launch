@@ -1,0 +1,7 @@
+<launch>
+	<node name="picamera_driver" pkg="picamera_driver" type="picamera_driver" output="screen">
+		<param name="framerate" value="100"/>
+		<param name="width" value="640"/>
+		<param name="height" value="480"/>
+	</node>
+</launch>
