@@ -1,8 +1,6 @@
 # Teleoperation Module for Roberto
 This is the Arduino code of the application that controls the robot and a robotic arm with the commands received from the Serial port.
 
-The Raspberry Pi part can be found in (https://github.com/Butakus/RobertoTeleop)
-
 
 ## Commands
 At this moment the commands available (received from the Serial port) are:
