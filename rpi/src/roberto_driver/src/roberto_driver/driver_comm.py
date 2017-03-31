@@ -8,6 +8,7 @@ import serial
 import sys
 from time import sleep, time
 from threading import Thread
+from multithreading import Lock
 
 BAUDRATE = 57600
 MAX_RETRIES = 3
@@ -153,7 +154,7 @@ class ArdPiComm(Thread):
         self.sent_seq = 0
         self.last_ack = None
         self.retries = 0
-        self.serial_lock = False
+        self.serial_lock = Lock()
         self.callback = message_callback
 
         print 'Connecting to serial port...'
@@ -194,7 +195,7 @@ class ArdPiComm(Thread):
                         # Clear the current buffer
                         in_buffer = []
             else:
-                sleep(0.01) # 10ms sleep
+                sleep(0.005) # 5ms sleep
 
         """ Code to test raw data received (without frame formatting)
         in_buffer = []
@@ -276,10 +277,7 @@ class ArdPiComm(Thread):
         data = frame.serialize()
 
         # Wait until the lock is released
-        while self.serial_lock:
-            sleep(0.005)
-        try:
-            self.serial_lock = True
+        with self.serial_lock
             # Split data in 64 bytes blocks
             while len(data) > 64:
                 self.ser.write(data[:64])
@@ -288,9 +286,6 @@ class ArdPiComm(Thread):
                 sleep(0.05)
             # Write the rest of the data
             self.ser.write(data)
-            # Release the serial lock
-        finally:
-            self.serial_lock = False
 
         # Do not wait for ACK after sending an ACK frame
         if frame.command == ACK_COMMAND:
