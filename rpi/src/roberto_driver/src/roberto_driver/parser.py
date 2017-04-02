@@ -79,14 +79,14 @@ def serialize_str(data):
 def parse_int8(data, big_endian=False):
     """ Convert a 8 bit signed int into a byte """
     byte_format = '>b' if big_endian else '<b'
-    data_str struct.pack(byte_format, data)
+    data_str = struct.pack(byte_format, data)
     return serialize_str(data_str)
 
 
 def serialize_int16(data, big_endian=False):
     """ Convert a 16 bit int into 2 bytes """
     byte_format = '>h' if big_endian else '<h'
-    data_str struct.pack(byte_format, data)
+    data_str = struct.pack(byte_format, data)
     return serialize_str(data_str)
 
 
@@ -105,7 +105,7 @@ def serialize_uint16(data, big_endian=False):
 def serialize_int32(data, big_endian=False):
     """ Convert a 32 bit int into 4 bytes """
     byte_format = '>i' if big_endian else '<i'
-    data_str struct.pack(byte_format, data)
+    data_str = struct.pack(byte_format, data)
     return serialize_str(data_str)
 
 
