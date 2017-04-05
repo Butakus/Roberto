@@ -92,7 +92,7 @@ def serialize_int16(data, big_endian=False):
 
 def serialize_uint16(data, big_endian=False):
     """ Convert an unsigned 16 bit int into 2 bytes """
-    data_bytes = []
+    data_bytes = [0]*2
     if big_endian:
         data_bytes[1] = data & 0xFF
         data_bytes[0] = (data >> 8) & 0xFF
@@ -111,7 +111,7 @@ def serialize_int32(data, big_endian=False):
 
 def serialize_uint32(data, big_endian=False):
     """ Convert an unsigned 32 bit int into 4 bytes """
-    data_bytes = []
+    data_bytes = [0]*4
     if big_endian:
         data_bytes[3] = data & 0xFF
         data_bytes[2] = (data >> 8) & 0xFF
