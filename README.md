@@ -13,7 +13,7 @@ The robot is currently controlled by a Raspberry Pi as main computer and an Ardu
 
 ## TODOs
 This will never end. What will be next?
-* Add install script to copy Arduino libs into sketchbook directory.
+
 * Finish documentation for current software.
 * Add a "doc" directory with API information and datasheets.
 * Add libraries for different sensors.
