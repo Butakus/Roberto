@@ -1,3 +1,6 @@
 [submodule "rpi/src/raspicam_node"]
 	path = rpi/src/raspicam_node
 	url = git@github.com:UbiquityRobotics/raspicam_node.git
+[submodule "arduino/lib/Encoder"]
+	path = arduino/lib/Encoder
+	url = https://github.com/PaulStoffregen/Encoder.git
