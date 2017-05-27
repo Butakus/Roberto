@@ -76,7 +76,7 @@ def serialize_str(data):
     return [ord(x) for x in data]
 
 
-def parse_int8(data, big_endian=False):
+def serialize_int8(data, big_endian=False):
     """ Convert a 8 bit signed int into a byte """
     byte_format = '>b' if big_endian else '<b'
     data_str = struct.pack(byte_format, data)

@@ -20,6 +20,7 @@ char parse_char(uint8_t* data)
 
 String parse_string(uint8_t* data, uint8_t length)
 {
+    // TODO
 	return String();
 }
 
@@ -63,7 +64,7 @@ void serialize_char(char& data, uint8_t* buffer)
 
 void serialize_string(String& data, uint8_t* buffer)
 {
-
+    // TODO
 }
 
 
