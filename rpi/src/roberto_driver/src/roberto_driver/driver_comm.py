@@ -8,7 +8,7 @@ import serial
 import sys
 from time import sleep, time
 from threading import Thread
-from multithreading import Lock
+from multiprocessing import Lock
 
 BAUDRATE = 57600
 MAX_RETRIES = 3
@@ -277,7 +277,7 @@ class ArdPiComm(Thread):
         data = frame.serialize()
 
         # Wait until the lock is released
-        with self.serial_lock
+        with self.serial_lock:
             # Split data in 64 bytes blocks
             while len(data) > 64:
                 self.ser.write(data[:64])

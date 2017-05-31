@@ -163,6 +163,7 @@ TX_Error ArdPiComm::send(uint8_t command, uint8_t payload_size, uint8_t payload[
             }
             else
             {
+                _sent_seq = (_sent_seq - 1) % 256;
                 error = send(command, payload_size, payload);
             }
         }
@@ -170,6 +171,7 @@ TX_Error ArdPiComm::send(uint8_t command, uint8_t payload_size, uint8_t payload[
         {
             // ACK OK
             error = NO_ERROR;
+            _retries = 0;
         }
     }
     return error;
