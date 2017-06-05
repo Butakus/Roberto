@@ -6,8 +6,8 @@ import struct
 """ Parsers: byte list to common types: """
 
 def parse_char(data):
-    """ Convert the given byte into a char """
-    return chr(data)
+    """ Convert the given 1-size byte list into a char """
+    return chr(data[0])
 
 
 def parse_str(data):
@@ -16,7 +16,7 @@ def parse_str(data):
 
 
 def parse_int8(data, big_endian=False):
-    """ Convert 1 byte into a 8 bit signed int """
+    """ Convert 1-size byte list into a 8 bit signed int """
     data_str = parse_str(data)
     byte_format = '>b' if big_endian else '<b'
     return struct.unpack(byte_format, data_str)[0]
@@ -67,8 +67,8 @@ def parse_float(data, big_endian=False):
 """ Serializers: common types to byte list: """
 
 def serialize_char(data):
-    """ Convert the given char into a byte """
-    return ord(data)
+    """ Convert the given char into a byte list """
+    return [ord(data)]
 
 
 def serialize_str(data):
@@ -77,7 +77,7 @@ def serialize_str(data):
 
 
 def serialize_int8(data, big_endian=False):
-    """ Convert a 8 bit signed int into a byte """
+    """ Convert a 8 bit signed int into a byte list """
     byte_format = '>b' if big_endian else '<b'
     data_str = struct.pack(byte_format, data)
     return serialize_str(data_str)

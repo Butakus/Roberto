@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     data = 'A'
     print "Sending cmd 10, char: '{}'...".format(data)
-    comm.send(10, [serialize_char(data)])
+    comm.send(10, serialize_char(data))
     sleep(1)
     
     data = 'test'
