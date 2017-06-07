@@ -41,8 +41,9 @@ void loop()
             case 2:
             {
                 // String test
-                String s = parse_string(&data[0], 4);
-                success = (uint8_t)(s == "test");
+                char s[10];
+                uint8_t length = parse_string(&data[0], s);
+                success = (strcmp(s, "test") == 0) && (length == 5);
                 error = comms.send(command, 1, &success);
                 break;
             }

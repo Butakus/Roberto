@@ -12,7 +12,12 @@ def parse_char(data):
 
 def parse_str(data):
     """ Convert the given byte list into a string (char array) """
-    return ''.join(chr(x) for x in data)
+    s = ''
+    for c in data:
+        if c == 0:
+            break
+        s += chr(c)
+    return s
 
 
 def parse_int8(data, big_endian=False):
@@ -73,7 +78,11 @@ def serialize_char(data):
 
 def serialize_str(data):
     """ Convert the given string into a byte list """
-    return [ord(x) for x in data]
+    # Sanitize the input first
+    data = data.replace('\0', '')
+    s = [ord(x) for x in data]
+    s.append(0)
+    return s
 
 
 def serialize_int8(data, big_endian=False):

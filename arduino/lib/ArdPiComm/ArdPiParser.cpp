@@ -15,45 +15,51 @@
 
 char parse_char(uint8_t* data)
 {
-	return (char) *data;
+    return (char) *data;
 }
 
-String parse_string(uint8_t* data, uint8_t length)
+uint8_t parse_string(uint8_t* data, char* out_buffer)
 {
-    // TODO
-	return String();
+    int i = 0;
+    while (data[i] != 0)
+    {
+        out_buffer[i] = (char) data[i];
+        ++i;
+    }
+    out_buffer[i] = 0;
+    return i + 1;
 }
 
 
 int8_t parse_int8(uint8_t* data)
 {
-	return (uint8_t) *data;
+    return (uint8_t) *data;
 }
 
 uint16_t parse_uint16(uint8_t* data)
 {
-	return *(uint16_t*) data;
+    return *(uint16_t*) data;
 }
 
 int16_t parse_int16(uint8_t* data)
 {
-	return *(int16_t*) data;
+    return *(int16_t*) data;
 }
 
 uint32_t parse_uint32(uint8_t* data)
 {
-	return *(uint32_t*) data;
+    return *(uint32_t*) data;
 }
 
 int32_t parse_int32(uint8_t* data)
 {
-	return *(int32_t*) data;
+    return *(int32_t*) data;
 }
 
 
 float parse_float(uint8_t* data)
 {
-	return *(float*) data;
+    return *(float*) data;
 }
 
 
@@ -62,9 +68,15 @@ void serialize_char(char& data, uint8_t* buffer)
     buffer[0] = (uint8_t)data;
 }
 
-void serialize_string(String& data, uint8_t* buffer)
+void serialize_string(char* data, uint8_t* buffer)
 {
-    // TODO
+    int i = 0;
+    while (data[i] != 0)
+    {
+        buffer[i] = (uint8_t)data[i];
+        ++i;
+    }
+    buffer[i] = 0;
 }
 
 

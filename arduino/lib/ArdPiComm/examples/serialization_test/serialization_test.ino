@@ -21,9 +21,9 @@ void setup()
     handle_error(error);
     delay(1000);
 
-    String s = "test";
+    char s[5] = "test";
     serialize_string(s, data);
-    error = comms.send(2, 4, data);
+    error = comms.send(2, 5, data);
     handle_error(error);
     delay(1000);
 

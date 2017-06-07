@@ -16,7 +16,7 @@
 #include <Arduino.h>
 
 char parse_char(uint8_t* data);
-String parse_string(uint8_t* data, uint8_t length);
+uint8_t parse_string(uint8_t* data, char* out_buffer);
 
 int8_t parse_int8(uint8_t* data);
 uint16_t parse_uint16(uint8_t* data);
@@ -28,7 +28,7 @@ float parse_float(uint8_t* data);
 
 
 void serialize_char(char& data, uint8_t* buffer);
-void serialize_string(String& data, uint8_t* buffer);
+void serialize_string(char* data, uint8_t* buffer);
 
 void serialize_int8(int8_t& data, uint8_t* buffer);
 void serialize_uint16(uint16_t& data, uint8_t* buffer);
