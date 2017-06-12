@@ -12,7 +12,7 @@ from multiprocessing import Lock
 
 BAUDRATE = 57600
 MAX_RETRIES = 3
-TIMEOUT = 3.0 # seconds
+TIMEOUT = 3.0  # seconds
 
 ACK_COMMAND = 0x01
 
@@ -38,31 +38,30 @@ class PacketFrame(object):
         self.payload_length = len(payload) & 0xFF
         self.payload = payload
 
-
     def serialize(self):
         """ Convert the object to a byte string to send it over the serial port and add the checksum """
         data = ""
         # Start
         data += chr(START_FLAG)
-        
+
         # Sequence number
         if check_flag_conflict(self.seq_number):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(self.seq_number))    
+            data += chr(invert_bit_5(self.seq_number))
         else:
             data += chr(self.seq_number)
-        
+
         # Command
         if check_flag_conflict(self.command):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(self.command))    
+            data += chr(invert_bit_5(self.command))
         else:
             data += chr(self.command)
-        
+
         # Payload length
         if check_flag_conflict(self.payload_length):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(self.payload_length))    
+            data += chr(invert_bit_5(self.payload_length))
         else:
             data += chr(self.payload_length)
 
@@ -70,7 +69,7 @@ class PacketFrame(object):
         for i in xrange(self.payload_length):
             if check_flag_conflict(self.payload[i]):
                 data += chr(ESCAPE_FLAG)
-                data += chr(invert_bit_5(self.payload[i]))    
+                data += chr(invert_bit_5(self.payload[i]))
             else:
                 data += chr(self.payload[i])
 
@@ -79,12 +78,12 @@ class PacketFrame(object):
 
         if check_flag_conflict(checksum_msb):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(checksum_msb))    
+            data += chr(invert_bit_5(checksum_msb))
         else:
             data += chr(checksum_msb)
         if check_flag_conflict(checksum_lsb):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(checksum_lsb))    
+            data += chr(invert_bit_5(checksum_lsb))
         else:
             data += chr(checksum_lsb)
 
@@ -92,7 +91,6 @@ class PacketFrame(object):
         data += chr(START_FLAG)
 
         return data
-
 
     def checksum(self):
         """ Compute the 16bit Fletcher's checksum of the data """
@@ -130,26 +128,26 @@ class ACKFrame(PacketFrame):
         data = ""
         # Start
         data += chr(START_FLAG)
-        
+
         # Sequence number
         if check_flag_conflict(self.seq_number):
             data += chr(ESCAPE_FLAG)
-            data += chr(invert_bit_5(self.seq_number))    
+            data += chr(invert_bit_5(self.seq_number))
         else:
             data += chr(self.seq_number)
-        
+
         # Command
         data += chr(self.command)
 
         # End
         data += chr(START_FLAG)
- 
+
         return data
 
 
 class ArdPiComm(Thread):
-    """Class to handle the serial object and implement the communication protocol"""
-    
+    """ Class to handle the serial object and implement the communication protocol """
+
     def __init__(self, message_callback, port='/dev/ttyACM0', baudrate=BAUDRATE):
         self.sent_seq = 0
         self.last_ack = None
@@ -175,7 +173,6 @@ class ArdPiComm(Thread):
         self.daemon = True
         self.running = True
 
-
     def run(self):
         """ Receive all incoming bytes and pack them in frames
             If the frame is an ack message, put it in the ACK buffer
@@ -195,7 +192,7 @@ class ArdPiComm(Thread):
                         # Clear the current buffer
                         in_buffer = []
             else:
-                sleep(0.005) # 5ms sleep
+                sleep(0.005)  # 5ms sleep
 
         """ Code to test raw data received (without frame formatting)
         in_buffer = []
@@ -206,7 +203,6 @@ class ArdPiComm(Thread):
                 print "Buffer: {}".format(in_buffer)
             sleep(0.01)
         """
-
 
     def process_frame(self, data):
         """ Get the byte array, create its corresponding frame object and process it """
@@ -234,14 +230,14 @@ class ArdPiComm(Thread):
                 retry = True
                 print "Packet payload mismatch"
             packet = PacketFrame(seq_number, command, payload)
-            
+
             # Check checksum
             received_checksum = (escaped_data[-3], escaped_data[-2])
             computed_checksum = packet.checksum()
             if received_checksum[0] != computed_checksum[0] or received_checksum[1] != computed_checksum[1]:
                 retry = True
                 print "Packet checksum mismatch"
-            
+
             # Send ACK.
             if retry:
                 # Reset the ack packet number to indicate retransmission
@@ -254,7 +250,6 @@ class ArdPiComm(Thread):
                 t.daemon = True
                 t.start()
 
-
     def stop(self):
         # Stop the thread and close the serial port
         self.running = False
@@ -265,7 +260,6 @@ class ArdPiComm(Thread):
             print 'Serial port closed.'
         else:
             print 'Serial port is already closed.'
-
 
     def send_frame(self, frame):
         """ Send a frame object to the serial port """
@@ -315,7 +309,6 @@ class ArdPiComm(Thread):
             self.retries = 0
             return True
 
-
     def send(self, command, payload=[]):
         """ Send a packet given the command and the payload """
         command = command & 0xFF
@@ -332,8 +325,9 @@ class ArdPiComm(Thread):
         return self.send_frame(frame)
 
 
-
 last_rx_time = 0
+
+
 def test_callback(command, payload):
     global last_rx_time
     print "\t\tTime since last packet: {}".format(time() - last_rx_time)
@@ -374,4 +368,3 @@ if __name__ == '__main__':
         elif command == 'q':
             break
     comm.stop()
-

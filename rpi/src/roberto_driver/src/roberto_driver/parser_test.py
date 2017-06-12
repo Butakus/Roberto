@@ -14,7 +14,7 @@ def test_callback(command, payload):
         data = parse_char(payload)
         print "Received char: '{}'...".format(data)
         print "Match 'A': {}".format(data == 'A')
-    
+
     elif command == 2:
         data = parse_str(payload)
         print "Received string: '{}'...".format(data)
@@ -52,9 +52,8 @@ def test_callback(command, payload):
         print "Float error: {}".format(abs(data - 3.14159265))
 
 
-
 if __name__ == '__main__':
-    
+
     comm = ArdPiComm(test_callback, port="/dev/ttyACM0")
     comm.start()
 
@@ -62,4 +61,3 @@ if __name__ == '__main__':
     sleep(2)
     raw_input()
     comm.stop()
-

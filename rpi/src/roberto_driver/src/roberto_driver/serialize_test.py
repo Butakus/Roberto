@@ -10,7 +10,7 @@ def test_callback(command, payload):
 
 
 if __name__ == '__main__':
-    
+
     comm = ArdPiComm(test_callback, port="/dev/ttyACM0")
     comm.start()
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     print "Sending cmd 10, char: '{}'...".format(data)
     comm.send(10, serialize_char(data))
     sleep(1)
-    
+
     data = 'test'
     print "Sending cmd 2, string: '{}'...".format(data)
     comm.send(2, serialize_str(data))
@@ -60,4 +60,3 @@ if __name__ == '__main__':
     sleep(5)
 
     comm.stop()
-

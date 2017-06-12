@@ -1,4 +1,5 @@
-""" TODO: DOC
+""" [DEPRECATED] Module to teleoperate roberto using raw sockets.
+    This file contains the utils to communicate with the master base station
 """
 
 import socket
@@ -10,56 +11,55 @@ PORT = 7070
 
 
 class MasterComm(Thread):
-	"""Thread to receive and process the commands from the master"""
-	
-	def __init__(self, callback, address=''):
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.sock.bind((address, PORT))
+    """Thread to receive and process the commands from the master"""
 
-		self.command_callback = callback
+    def __init__(self, callback, address=''):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind((address, PORT))
 
-		Thread.__init__(self)
-		self.daemon = True
-		self.running = True
+        self.command_callback = callback
 
-	def run(self):
-		print 'MasterComm thread running'
-		buff = ''
-		while self.running:
-			new_data, addr = self.sock.recvfrom(1024)
-			buff += new_data
-			endl = buff.find('\n')
-			if endl != -1:
-				data = buff[:endl]
-				buff = buff[endl+1:]
-				command,argument = data.split(',')
-				# Process the command outside here.
-				# Both comand and argument shall be parsed in the callback function,
-				# so this interface is command-agnostic
-				self.command_callback(command, argument)
-			sleep(0.02)
+        Thread.__init__(self)
+        self.daemon = True
+        self.running = True
 
+    def run(self):
+        print 'MasterComm thread running'
+        buff = ''
+        while self.running:
+            new_data, addr = self.sock.recvfrom(1024)
+            buff += new_data
+            endl = buff.find('\n')
+            if endl != -1:
+                data = buff[:endl]
+                buff = buff[endl + 1:]
+                command, argument = data.split(',')
+                # Process the command outside here.
+                # Both comand and argument shall be parsed in the callback function,
+                # so this interface is command-agnostic
+                self.command_callback(command, argument)
+            sleep(0.02)
 
-	def stop(self):
-		print 'Stopping comms'
-		self.sock.close()
-		self.running = False
+    def stop(self):
+        print 'Stopping comms'
+        self.sock.close()
+        self.running = False
 
 
 def test_callback(command, argument):
-	try:
-		argument = int(argument)
-	except ValueError, ve:
-		print 'Argument error, not a byte'
-	except TypeError, te:
-		print 'Argument error, not integer'
-	else:
-		print 'Received command: {}({})'.format(command, argument)
+    try:
+        argument = int(argument)
+    except ValueError:
+        print 'Argument error, not a byte'
+    except TypeError:
+        print 'Argument error, not integer'
+    else:
+        print 'Received command: {}({})'.format(command, argument)
 
 
 if __name__ == '__main__':
-	# TEST
-	comms = MasterComm(test_callback)
-	comms.start()
-	sleep(10)
-	comms.stop()
+    # TEST
+    comms = MasterComm(test_callback)
+    comms.start()
+    sleep(10)
+    comms.stop()

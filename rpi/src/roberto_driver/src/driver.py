@@ -8,7 +8,7 @@ from geometry_msgs.msg import Twist
 # ArdPiComm object
 comms = None
 
-""" Command code list. 
+""" Command code list.
     We must send the corresponding code value to the driver.
 """
 DRIVER_COMMANDS = {
@@ -65,7 +65,6 @@ def velocity_callback(twist_msg):
         # Stop
         rospy.logdebug("[ROBERTO_DRIVER] Stopping")
         comms.send(DRIVER_COMMANDS["stop"])
-
 
 
 if __name__ == '__main__':

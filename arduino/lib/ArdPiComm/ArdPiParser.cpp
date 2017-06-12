@@ -1,6 +1,5 @@
 /* Module to parse and serialize the data from/into the bytes received/to send
 *
-*  TODO: Docs  
 *
 *  Note: Works only on version 1.0 and above of Arduino IDE. (only arduino.h)
 *
